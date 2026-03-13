@@ -51,58 +51,65 @@ p.s{color:#64748b;margin-top:6px;font-size:14px}
   <div id="res"></div>
 </div>
 <script>
-var rows=[],cat="Все";
-var C={"HR":"#FF6B6B","АХО":"#4ECDC4","IT":"#45B7D1","default":"#A78BFA"};
+var PROXY = "https://api-proxy.evd0kim0vakrr.workers.dev";
+var rows = [], cat = "Все";
+var C = {"HR":"#FF6B6B","АХО":"#4ECDC4","IT":"#45B7D1","default":"#A78BFA"};
 function gc(c){return C[c]||C["default"];}
 
-// Загружаем CSV файл
-Papa.parse("data.csv",{
-  download:true,header:true,skipEmptyLines:true,
-  complete:function(res){
-    rows=res.data.filter(function(r){return r["Вопросы"]&&r["Ответ"];});
-    document.getElementById("cnt").textContent=rows.length+" вопросов";
-    document.getElementById("btn").disabled=false;
-    document.getElementById("st").textContent="Введите вопрос для поиска.";
-    var cs=["Все"],seen={};
+Papa.parse("data.csv", {
+  download: true, header: true, skipEmptyLines: true,
+  complete: function(res) {
+    rows = res.data.filter(function(r){return r["Вопросы"] && r["Ответ"];});
+    document.getElementById("cnt").textContent = rows.length + " вопросов";
+    document.getElementById("btn").disabled = false;
+    document.getElementById("st").textContent = "Введите вопрос для поиска.";
+    var cs = ["Все"], seen = {};
     rows.forEach(function(r){var c=(r["Категория"]||"").trim();if(c&&!seen[c]){seen[c]=1;cs.push(c);}});
-    document.getElementById("cats").innerHTML=cs.map(function(c){
-      return'<button class="cb'+(c==="Все"?" on":"")+'" onclick="sc(this,\''+c.replace(/'/g,"\\'")+'\')">'+ esc(c)+'</button>';
+    document.getElementById("cats").innerHTML = cs.map(function(c){
+      return '<button class="cb'+(c==="Все"?" on":"")+'" onclick="sc(this,\''+c.replace(/'/g,"\\'")+'\')">'+esc(c)+'</button>';
     }).join("");
   },
-  error:function(){document.getElementById("st").innerHTML='<div class="er">Ошибка загрузки данных</div>';}
+  error: function(){document.getElementById("st").innerHTML='<div class="er">Ошибка загрузки данных</div>';}
 });
 
 function sc(el,c){cat=c;var bs=document.querySelectorAll(".cb");for(var i=0;i<bs.length;i++)bs[i].classList.toggle("on",bs[i]===el);}
 
 function go(){
-  var q=document.getElementById("q").value.trim();if(!q)return;
-  var btn=document.getElementById("btn"),st=document.getElementById("st");
-  btn.disabled=true;btn.textContent="⏳";
-  st.className="st pu";st.textContent="🔍 Ищем похожие вопросы...";
-  document.getElementById("res").innerHTML="";
-  var pool=cat==="Все"?rows:rows.filter(function(r){return(r["Категория"]||"").trim()===cat;});
-  var idx=pool.map(function(r,i){return"["+i+"] "+r["Вопросы"];}).join("\n");
-  var pr="Ты помощник по базе знаний сотрудников. Вопрос пользователя:\n\""+q+"\"\n\nСписок вопросов:\n"+idx+"\n\nНайди 1–5 наиболее похожих по смыслу. Верни ТОЛЬКО JSON-массив числовых индексов: [3,17] или []. Только JSON.";
-  fetch("https://api-proxy.evd0kim0vakrr.workers.dev",{
-    method:"POST",
-    headers:{"Content-Type":"application/json","anthropic-version":"2023-06-01"},
-    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:pr}]})
-  }).then(function(r){return r.json();}).then(function(d){
-    if(d.error)throw new Error(d.error.message);
-    var txt=(d.content||[]).map(function(b){return b.text||"";}).join("");
-    var found=JSON.parse(txt.replace(/```json|```/g,"").trim()).map(function(i){return pool[i];}).filter(Boolean);
+  var q = document.getElementById("q").value.trim();
+  if(!q) return;
+  var btn = document.getElementById("btn"), st = document.getElementById("st");
+  btn.disabled = true; btn.textContent = "⏳";
+  st.className = "st pu"; st.textContent = "🔍 Ищем похожие вопросы...";
+  document.getElementById("res").innerHTML = "";
+  var pool = cat==="Все" ? rows : rows.filter(function(r){return(r["Категория"]||"").trim()===cat;});
+  var idx = pool.map(function(r,i){return "["+i+"] "+r["Вопросы"];}).join("\n");
+  var prompt = "Ты помощник по базе знаний сотрудников. Вопрос пользователя:\n\"" + q + "\"\n\nСписок вопросов:\n" + idx + "\n\nНайди 1-5 наиболее похожих по смыслу. Верни ТОЛЬКО JSON-массив числовых индексов: [3,17] или []. Только JSON.";
+  fetch(PROXY, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 200,
+      messages: [{role: "user", content: prompt}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error) throw new Error(d.error.message);
+    var txt = (d.content||[]).map(function(b){return b.text||"";}).join("");
+    var found = JSON.parse(txt.replace(/```json|```/g,"").trim()).map(function(i){return pool[i];}).filter(Boolean);
     if(!found.length){st.className="st";st.textContent="😕 Ничего не найдено.";btn.disabled=false;btn.textContent="Найти";return;}
     st.className="st";st.textContent="";
     document.getElementById("res").innerHTML='<div class="cn">Найдено '+found.length+'</div>'+found.map(function(r){
       var c=(r["Категория"]||"").trim(),col=gc(c);
       var b=c?'<span class="badge" style="background:'+col+'22;color:'+col+';border:1px solid '+col+'55">'+esc(c)+'</span>':"";
       var q2=(r["Квартал"]||"").trim(),qr=q2?'<span class="qt">🗓 '+esc(q2)+'</span>':"";
-      return'<div class="card" onclick="tog(this)"><div class="ch"><div style="flex:1"><div class="cm">'+b+qr+'</div><div class="cq">'+esc(r["Вопросы"])+'</div></div><span class="cv">▼</span></div><div class="ca" style="display:none">'+esc(r["Ответ"])+'</div></div>';
+      return '<div class="card" onclick="tog(this)"><div class="ch"><div style="flex:1"><div class="cm">'+b+qr+'</div><div class="cq">'+esc(r["Вопросы"])+'</div></div><span class="cv">▼</span></div><div class="ca" style="display:none">'+esc(r["Ответ"])+'</div></div>';
     }).join("");
     var first=document.querySelector(".card");if(first)tog(first);
-  }).catch(function(e){
-    st.className="st";st.innerHTML='<div class="er">Ошибка: '+e.message+'</div>';
-  }).finally(function(){btn.disabled=false;btn.textContent="Найти";});
+  })
+  .catch(function(e){st.className="st";st.innerHTML='<div class="er">Ошибка: '+e.message+'</div>';})
+  .finally(function(){btn.disabled=false;btn.textContent="Найти";});
 }
 function tog(el){var a=el.querySelector(".ca"),v=el.querySelector(".cv"),o=a.style.display==="block";a.style.display=o?"none":"block";v.textContent=o?"▼":"▲";el.classList.toggle("open",!o);}
 function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
