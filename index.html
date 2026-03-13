@@ -85,7 +85,7 @@ function go(){
   var pr="Ты помощник по базе знаний сотрудников. Вопрос пользователя:\n\""+q+"\"\n\nСписок вопросов:\n"+idx+"\n\nНайди 1–5 наиболее похожих по смыслу. Верни ТОЛЬКО JSON-массив числовых индексов: [3,17] или []. Только JSON.";
   fetch("https://api-proxy.evd0kim0vakrr.workers.dev",{
     method:"POST",
-    headers:{"Content-Type":"application/json","x-api-key":K,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    headers:{"Content-Type":"application/json","anthropic-version":"2023-06-01"},
     body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:pr}]})
   }).then(function(r){return r.json();}).then(function(d){
     if(d.error)throw new Error(d.error.message);
