@@ -6,114 +6,238 @@
 <title>База знаний — Спанч Боб</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;background:#0f0f1a;color:#e2e8f0;font-family:'Segoe UI',sans-serif;padding:32px 16px}
-.w{max-width:720px;margin:0 auto}
-.hd{text-align:center;margin-bottom:32px}
-h1{font-size:28px;font-weight:800;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-p.s{color:#64748b;margin-top:6px;font-size:14px}
-.cats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
-.cb{padding:6px 16px;border-radius:999px;border:1px solid #2a2a4a;background:transparent;color:#64748b;cursor:pointer;font-weight:600;font-size:13px}
-.cb.on{border-color:#7c3aed;background:#7c3aed22;color:#a78bfa}
-.sr{display:flex;gap:10px;margin-bottom:28px}
-.sr input{flex:1;padding:14px 18px;border-radius:12px;border:1px solid #2a2a4a;background:#1a1a2e;color:#e2e8f0;font-size:15px;outline:none}
-.sr input:focus{border-color:#7c3aed}
-.sr button{padding:14px 24px;border-radius:12px;border:none;background:linear-gradient(135deg,#7c3aed,#06b6d4);color:#fff;font-weight:700;font-size:15px;cursor:pointer}
-.sr button:disabled{opacity:.5;cursor:not-allowed}
-.card{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:14px;margin-bottom:12px;overflow:hidden;cursor:pointer}
-.card.open{box-shadow:0 4px 24px #7c3aed33}
-.ch{padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.cm{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;align-items:center}
-.badge{border-radius:6px;padding:2px 10px;font-size:12px;font-weight:700}
-.qt{color:#888;font-size:12px}
-.cq{color:#e2e8f0;font-weight:600;font-size:15px;line-height:1.4}
-.cv{color:#7c3aed;font-size:18px;flex-shrink:0}
-.ca{padding:14px 20px 18px;color:#94a3b8;font-size:14px;line-height:1.7;border-top:1px solid #2a2a4a}
-.st{text-align:center;padding:40px;color:#64748b}
-.pu{color:#a78bfa}
-.er{background:#ff6b6b22;border:1px solid #ff6b6b55;border-radius:10px;padding:16px;color:#ff6b6b;margin-bottom:20px}
-.cn{color:#64748b;font-size:13px;margin-bottom:16px}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; background: #0f0f1a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; padding: 32px 16px; }
+  .w { max-width: 720px; margin: 0 auto; }
+
+  /* Шапка */
+  .hd { text-align: center; margin-bottom: 32px; }
+  .hd .emoji { font-size: 44px; margin-bottom: 8px; }
+  h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hd p { color: #64748b; margin-top: 6px; font-size: 14px; }
+
+  /* Категории */
+  .cats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+  .cb { padding: 6px 16px; border-radius: 999px; border: 1px solid #2a2a4a; background: transparent; color: #64748b; cursor: pointer; font-weight: 600; font-size: 13px; transition: all .2s; }
+  .cb.on { border-color: #7c3aed; background: #7c3aed22; color: #a78bfa; }
+
+  /* Поиск */
+  .sr { display: flex; gap: 10px; margin-bottom: 28px; }
+  .sr input { flex: 1; padding: 14px 18px; border-radius: 12px; border: 1px solid #2a2a4a; background: #1a1a2e; color: #e2e8f0; font-size: 15px; outline: none; transition: border-color .2s; }
+  .sr input:focus { border-color: #7c3aed; }
+  .sr button { padding: 14px 24px; border-radius: 12px; border: none; background: linear-gradient(135deg, #7c3aed, #06b6d4); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; transition: opacity .2s; }
+  .sr button:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Карточки */
+  .card { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 14px; margin-bottom: 12px; overflow: hidden; cursor: pointer; transition: box-shadow .2s; }
+  .card.open { box-shadow: 0 4px 24px #7c3aed33; }
+  .ch { padding: 16px 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .cm { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; align-items: center; }
+  .badge { border-radius: 6px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+  .qt { color: #888; font-size: 12px; }
+  .cq { color: #e2e8f0; font-weight: 600; font-size: 15px; line-height: 1.4; }
+  .cv { color: #7c3aed; font-size: 18px; flex-shrink: 0; }
+  .ca { padding: 14px 20px 18px; color: #94a3b8; font-size: 14px; line-height: 1.7; border-top: 1px solid #2a2a4a; display: none; }
+
+  /* Статус */
+  .st { text-align: center; padding: 40px; color: #64748b; }
+  .st.loading { color: #a78bfa; }
+  .cn { color: #64748b; font-size: 13px; margin-bottom: 16px; }
+  .er { background: #ff6b6b22; border: 1px solid #ff6b6b55; border-radius: 10px; padding: 16px; color: #ff6b6b; margin-bottom: 20px; }
 </style>
 </head>
 <body>
 <div class="w">
+
   <div class="hd">
-    <div style="font-size:44px;margin-bottom:8px">🧽</div>
+    <div class="emoji">🧽</div>
     <h1>База знаний</h1>
-    <p class="s">Форма «Спанч Боб» · <span id="cnt">загрузка...</span></p>
+    <p>Форма «Спанч Боб» · <span id="cnt">загрузка...</span></p>
   </div>
+
   <div class="cats" id="cats"></div>
+
   <div class="sr">
-    <input type="text" id="q" placeholder="Введите ваш вопрос..." onkeydown="if(event.key==='Enter')go()"/>
-    <button id="btn" onclick="go()" disabled>Найти</button>
+    <input type="text" id="q" placeholder="Введите ваш вопрос..." />
+    <button id="btn" disabled>Найти</button>
   </div>
+
   <div id="st" class="st">Загрузка базы знаний...</div>
   <div id="res"></div>
+
 </div>
 <script>
-var PROXY = "https://api-proxy.evd0kim0vakrr.workers.dev";
-var rows = [], cat = "Все";
-var C = {"HR":"#FF6B6B","АХО":"#4ECDC4","IT":"#45B7D1","default":"#A78BFA"};
-function gc(c){return C[c]||C["default"];}
+  var PROXY = "https://api-proxy.evd0kim0vakrr.workers.dev";
+  var CSV_URL = "https://raw.githubusercontent.com/Karina-KD/Baza-znanii/main/data.csv";
+  var COLORS = { "HR": "#FF6B6B", "АХО": "#4ECDC4", "IT": "#45B7D1", "default": "#A78BFA" };
 
-Papa.parse("https://raw.githubusercontent.com/Karina-KD/Baza-znanii/refs/heads/main/data.csv", {
-  download: true, header: true, skipEmptyLines: true,
-  complete: function(res) {
-    rows = res.data.filter(function(r){return r["Вопросы"] && r["Ответ"];});
-    document.getElementById("cnt").textContent = rows.length + " вопросов";
-    document.getElementById("btn").disabled = false;
-    document.getElementById("st").textContent = "Введите вопрос для поиска.";
-    var cs = ["Все"], seen = {};
-    rows.forEach(function(r){var c=(r["Категория"]||"").trim();if(c&&!seen[c]){seen[c]=1;cs.push(c);}});
-    document.getElementById("cats").innerHTML = cs.map(function(c){
-      return '<button class="cb'+(c==="Все"?" on":"")+'" onclick="sc(this,\''+c.replace(/'/g,"\\'")+'\')">'+esc(c)+'</button>';
-    }).join("");
-  },
-  error: function(){document.getElementById("st").innerHTML='<div class="er">Ошибка загрузки данных</div>';}
-});
+  var rows = [];
+  var activeCat = "Все";
 
-function sc(el,c){cat=c;var bs=document.querySelectorAll(".cb");for(var i=0;i<bs.length;i++)bs[i].classList.toggle("on",bs[i]===el);}
+  /* --- Получить цвет категории --- */
+  function getColor(cat) {
+    return COLORS[cat] || COLORS["default"];
+  }
 
-function go(){
-  var q = document.getElementById("q").value.trim();
-  if(!q) return;
-  var btn = document.getElementById("btn"), st = document.getElementById("st");
-  btn.disabled = true; btn.textContent = "⏳";
-  st.className = "st pu"; st.textContent = "🔍 Ищем похожие вопросы...";
-  document.getElementById("res").innerHTML = "";
-  var pool = cat==="Все" ? rows : rows.filter(function(r){return(r["Категория"]||"").trim()===cat;});
- var pool2 = cat === "Все" ? pool.slice(0, 150) : pool;
-var idx = pool2.map(function(r,i){return "["+i+"] "+r["Вопросы"];}).join("\n");
-var prompt = "Вопрос: \"" + q + "\"\n\nВопросы:\n" + idx + "\n\nJSON-массив индексов похожих вопросов (1-5 штук): ";
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 200,
-      system: "You are a search assistant. Always respond with ONLY a JSON array of indices like [3,17] or []. Never include any other text.",
-      messages: [{role: "user", content: prompt}]
+  /* --- Экранирование HTML --- */
+  function esc(s) {
+    return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* --- Установить статус --- */
+  function setStatus(text, cls) {
+    var el = document.getElementById("st");
+    el.className = "st" + (cls ? " " + cls : "");
+    el.innerHTML = text;
+  }
+
+  /* --- Переключить карточку --- */
+  function toggle(el) {
+    var body = el.querySelector(".ca");
+    var arrow = el.querySelector(".cv");
+    var isOpen = body.style.display === "block";
+    body.style.display = isOpen ? "none" : "block";
+    arrow.textContent = isOpen ? "▼" : "▲";
+    el.classList.toggle("open", !isOpen);
+  }
+
+  /* --- Выбор категории --- */
+  function selectCat(el, name) {
+    activeCat = name;
+    document.querySelectorAll(".cb").forEach(function(b) {
+      b.classList.toggle("on", b === el);
+    });
+  }
+
+  /* --- Загрузка CSV --- */
+  Papa.parse(CSV_URL, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(result) {
+      rows = result.data.filter(function(r) {
+        return r["Вопросы"] && r["Ответ"];
+      });
+
+      document.getElementById("cnt").textContent = rows.length + " вопросов";
+      document.getElementById("btn").disabled = false;
+      setStatus("Введите вопрос для поиска.");
+
+      /* Собрать список категорий */
+      var cats = ["Все"];
+      var seen = {};
+      rows.forEach(function(r) {
+        var c = (r["Категория"] || "").trim();
+        if (c && !seen[c]) { seen[c] = true; cats.push(c); }
+      });
+
+      document.getElementById("cats").innerHTML = cats.map(function(c) {
+        var active = c === "Все" ? " on" : "";
+        var safe = c.replace(/'/g, "\\'");
+        return '<button class="cb' + active + '" onclick="selectCat(this,\'' + safe + '\')">' + esc(c) + '</button>';
+      }).join("");
+    },
+    error: function() {
+      setStatus('<div class="er">❌ Ошибка загрузки данных. Проверьте ссылку на CSV.</div>');
+    }
+  });
+
+  /* --- Поиск --- */
+  document.getElementById("btn").addEventListener("click", search);
+  document.getElementById("q").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") search();
+  });
+
+  function search() {
+    var q = document.getElementById("q").value.trim();
+    if (!q) return;
+
+    var btn = document.getElementById("btn");
+    btn.disabled = true;
+    btn.textContent = "⏳";
+    setStatus("🔍 Ищем похожие вопросы...", "loading");
+    document.getElementById("res").innerHTML = "";
+
+    /* Фильтр по категории */
+    var pool = activeCat === "Все"
+      ? rows
+      : rows.filter(function(r) { return (r["Категория"] || "").trim() === activeCat; });
+
+    /* Ограничение: максимум 150 вопросов в промпте */
+    var pool2 = activeCat === "Все" ? pool.slice(0, 150) : pool;
+
+    /* Индекс вопросов для Claude */
+    var idx = pool2.map(function(r, i) {
+      return "[" + i + "] " + r["Вопросы"];
+    }).join("\n");
+
+    var prompt = "Вопрос: \"" + q + "\"\n\nВопросы:\n" + idx + "\n\nJSON-массив индексов похожих вопросов (1-5 штук):";
+
+    fetch(PROXY, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        system: "You are a search assistant. Always respond with ONLY a JSON array of indices like [3,17] or []. Never include any other text.",
+        messages: [{ role: "user", content: prompt }]
+      })
     })
-  })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.error) throw new Error(d.error.message);
-    var txt = (d.content||[]).map(function(b){return b.text||"";}).join("");
-    var found = JSON.parse(txt.replace(/```json|```/g,"").trim()).map(function(i){return pool2[i];}).filter(Boolean);
-    if(!found.length){st.className="st";st.textContent="😕 Ничего не найдено.";btn.disabled=false;btn.textContent="Найти";return;}
-    st.className="st";st.textContent="";
-    document.getElementById("res").innerHTML='<div class="cn">Найдено '+found.length+'</div>'+found.map(function(r){
-      var c=(r["Категория"]||"").trim(),col=gc(c);
-      var b=c?'<span class="badge" style="background:'+col+'22;color:'+col+';border:1px solid '+col+'55">'+esc(c)+'</span>':"";
-      var q2=(r["Квартал"]||"").trim(),qr=q2?'<span class="qt">🗓 '+esc(q2)+'</span>':"";
-      return '<div class="card" onclick="tog(this)"><div class="ch"><div style="flex:1"><div class="cm">'+b+qr+'</div><div class="cq">'+esc(r["Вопросы"])+'</div></div><span class="cv">▼</span></div><div class="ca" style="display:none">'+esc(r["Ответ"])+'</div></div>';
-    }).join("");
-    var first=document.querySelector(".card");if(first)tog(first);
-  })
-  .catch(function(e){st.className="st";st.innerHTML='<div class="er">Ошибка: '+e.message+'</div>';})
-  .finally(function(){btn.disabled=false;btn.textContent="Найти";});
-}
-function tog(el){var a=el.querySelector(".ca"),v=el.querySelector(".cv"),o=a.style.display==="block";a.style.display=o?"none":"block";v.textContent=o?"▼":"▲";el.classList.toggle("open",!o);}
-function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+    .then(function(r) {
+      if (!r.ok) throw new Error("Сервер вернул ошибку: " + r.status);
+      return r.json();
+    })
+    .then(function(d) {
+      if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+
+      var txt = (d.content || []).map(function(b) { return b.text || ""; }).join("");
+      var clean = txt.replace(/```json|```/g, "").trim();
+      var indices = JSON.parse(clean);
+
+      var found = indices.map(function(i) { return pool2[i]; }).filter(Boolean);
+
+      if (!found.length) {
+        setStatus("😕 Ничего не найдено. Попробуйте другой вопрос.");
+        return;
+      }
+
+      setStatus("");
+      document.getElementById("res").innerHTML =
+        '<div class="cn">Найдено: ' + found.length + '</div>' +
+        found.map(function(r) {
+          var c = (r["Категория"] || "").trim();
+          var col = getColor(c);
+          var badge = c
+            ? '<span class="badge" style="background:' + col + '22;color:' + col + ';border:1px solid ' + col + '55">' + esc(c) + '</span>'
+            : "";
+          var q2 = (r["Квартал"] || "").trim();
+          var quarter = q2 ? '<span class="qt">🗓 ' + esc(q2) + '</span>' : "";
+          return (
+            '<div class="card" onclick="toggle(this)">' +
+              '<div class="ch">' +
+                '<div style="flex:1">' +
+                  '<div class="cm">' + badge + quarter + '</div>' +
+                  '<div class="cq">' + esc(r["Вопросы"]) + '</div>' +
+                '</div>' +
+                '<span class="cv">▼</span>' +
+              '</div>' +
+              '<div class="ca">' + esc(r["Ответ"]) + '</div>' +
+            '</div>'
+          );
+        }).join("");
+
+      /* Открыть первую карточку */
+      var first = document.querySelector(".card");
+      if (first) toggle(first);
+    })
+    .catch(function(e) {
+      setStatus('<div class="er">❌ Ошибка: ' + esc(e.message) + '</div>');
+    })
+    .finally(function() {
+      btn.disabled = false;
+      btn.textContent = "Найти";
+    });
+  }
 </script>
 </body>
 </html>
