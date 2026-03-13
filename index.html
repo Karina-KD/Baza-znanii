@@ -56,7 +56,7 @@ var rows = [], cat = "Все";
 var C = {"HR":"#FF6B6B","АХО":"#4ECDC4","IT":"#45B7D1","default":"#A78BFA"};
 function gc(c){return C[c]||C["default"];}
 
-Papa.parse("data.csv", {
+Papa.parse("https://raw.githubusercontent.com/Karina-KD/Baza-znanii/refs/heads/main/data.csv", {
   download: true, header: true, skipEmptyLines: true,
   complete: function(res) {
     rows = res.data.filter(function(r){return r["Вопросы"] && r["Ответ"];});
