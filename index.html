@@ -88,7 +88,7 @@ var prompt = "Вопрос: \"" + q + "\"\n\nВопросы:\n" + idx + "\n\nJSO
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
-model: "claude-sonnet-4-20250514",
+ model: "claude-sonnet-4-20250514",
       max_tokens: 200,
       system: "You are a search assistant. Always respond with ONLY a JSON array of indices like [3,17] or []. Never include any other text.",
       messages: [{role: "user", content: prompt}]
