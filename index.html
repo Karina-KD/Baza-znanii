@@ -83,8 +83,7 @@ function go(){
   document.getElementById("res").innerHTML = "";
   var pool = cat==="Все" ? rows : rows.filter(function(r){return(r["Категория"]||"").trim()===cat;});
   var idx = pool.map(function(r,i){return "["+i+"] "+r["Вопросы"];}).join("\n");
-  var prompt = "Ты помощник по базе знаний сотрудников. Вопрос пользователя:\n\"" + q + "\"\n\nСписок вопросов:\n" + idx + "\n\nНайди 1-5 наиболее похожих по смыслу. Верни ТОЛЬКО JSON-массив числовых индексов: [3,17] или []. Только JSON.";
-  fetch(PROXY, {
+var prompt = "Вопрос: \"" + q + "\"\n\nВопросы:\n" + idx + "\n\nJSON-массив индексов похожих вопросов (1-5 штук): ";
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
