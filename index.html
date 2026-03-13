@@ -142,6 +142,40 @@
     }
   });
 
+  /* --- Умная предфильтрация по ключевым словам --- */
+  function preFilter(pool, query, limit) {
+    var words = query.toLowerCase().split(/\s+/).filter(function(w) { return w.length > 2; });
+    if (!words.length) return pool.slice(0, limit);
+
+    var scored = pool.map(function(r) {
+      var text = (r["Вопросы"] + " " + (r["Ответ"] || "")).toLowerCase();
+      var score = 0;
+      words.forEach(function(w) {
+        if (text.indexOf(w) !== -1) score += 2;
+        // частичное совпадение
+        if (score === 0) {
+          words.forEach(function(w2) {
+            if (w2.length > 3 && text.indexOf(w2.slice(0, -1)) !== -1) score += 1;
+          });
+        }
+      });
+      return { r: r, s: score };
+    });
+
+    // Сортируем: сначала с совпадениями, остальные добавляем до лимита
+    var matched = scored.filter(function(x) { return x.s > 0; })
+                        .sort(function(a, b) { return b.s - a.s; })
+                        .slice(0, limit)
+                        .map(function(x) { return x.r; });
+
+    if (matched.length >= 10) return matched;
+
+    // Если мало совпадений — добавляем рандомных до лимита
+    var matchedSet = new Set(matched);
+    var rest = pool.filter(function(r) { return !matchedSet.has(r); }).slice(0, limit - matched.length);
+    return matched.concat(rest);
+  }
+
   /* --- Поиск --- */
   document.getElementById("btn").addEventListener("click", search);
   document.getElementById("q").addEventListener("keydown", function(e) {
@@ -163,8 +197,8 @@
       ? rows
       : rows.filter(function(r) { return (r["Категория"] || "").trim() === activeCat; });
 
-    /* Ограничение: максимум 150 вопросов в промпте */
-    var pool2 = activeCat === "Все" ? pool.slice(0, 150) : pool;
+    /* Умная фильтрация: сначала JS ищет по ключевым словам, Claude получает максимум 30 */
+    var pool2 = preFilter(pool, q, 30);
 
     /* Индекс вопросов для Claude */
     var idx = pool2.map(function(r, i) {
