@@ -82,7 +82,8 @@ function go(){
   st.className = "st pu"; st.textContent = "🔍 Ищем похожие вопросы...";
   document.getElementById("res").innerHTML = "";
   var pool = cat==="Все" ? rows : rows.filter(function(r){return(r["Категория"]||"").trim()===cat;});
-  var idx = pool.map(function(r,i){return "["+i+"] "+r["Вопросы"];}).join("\n");
+ var pool2 = cat === "Все" ? pool.slice(0, 150) : pool;
+var idx = pool2.map(function(r,i){return "["+i+"] "+r["Вопросы"];}).join("\n");
 var prompt = "Вопрос: \"" + q + "\"\n\nВопросы:\n" + idx + "\n\nJSON-массив индексов похожих вопросов (1-5 штук): ";
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -97,7 +98,7 @@ model: "claude-sonnet-4-20250514",
   .then(function(d){
     if(d.error) throw new Error(d.error.message);
     var txt = (d.content||[]).map(function(b){return b.text||"";}).join("");
-    var found = JSON.parse(txt.replace(/```json|```/g,"").trim()).map(function(i){return pool[i];}).filter(Boolean);
+    var found = JSON.parse(txt.replace(/```json|```/g,"").trim()).map(function(i){return pool2[i];}).filter(Boolean);
     if(!found.length){st.className="st";st.textContent="😕 Ничего не найдено.";btn.disabled=false;btn.textContent="Найти";return;}
     st.className="st";st.textContent="";
     document.getElementById("res").innerHTML='<div class="cn">Найдено '+found.length+'</div>'+found.map(function(r){
