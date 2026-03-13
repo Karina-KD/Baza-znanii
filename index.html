@@ -90,7 +90,7 @@ function go(){
     body: JSON.stringify({
 model: "claude-sonnet-4-20250514",
       max_tokens: 200,
-      system: "Respond with ONLY a JSON array of indices like [3,17] or []. No other text.",
+      system: "You are a search assistant. Always respond with ONLY a JSON array of indices like [3,17] or []. Never include any other text.",
       messages: [{role: "user", content: prompt}]
     })
   })
